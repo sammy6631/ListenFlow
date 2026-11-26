@@ -1,0 +1,27 @@
+{
+  "name": "ListenFlow — Neural Text to Speech",
+  "short_name": "ListenFlow",
+  "description": "Convert PDFs, Word docs, eBooks, web articles, and on-screen text into natural neural speech.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0d14",
+  "theme_color": "#7c3aed",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

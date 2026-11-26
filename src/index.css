@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+    --font-dyslexic: 'Verdana', 'Tahoma', 'Arial', sans-serif;
+  }
+
+  html,
+  body {
+    font-family: var(--font-sans);
+    overscroll-behavior-y: none;
+  }
+}
+
+.font-reader-sans {
+  font-family: var(--font-sans);
+}
+
+.font-reader-serif {
+  font-family: var(--font-serif);
+}
+
+.font-reader-dyslexic {
+  font-family: var(--font-dyslexic);
+  letter-spacing: 0.045em;
+  word-spacing: 0.14em;
+}
+
+/* Custom sleek scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.45);
+}
+
+/* Smooth range slider */
+input[type='range'].listen-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type='range'].listen-slider::-webkit-slider-runnable-track {
+  height: 5px;
+  border-radius: 9999px;
+  background: rgba(148, 163, 184, 0.25);
+}
+
+input[type='range'].listen-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 9999px;
+  background: #8b5cf6;
+  border: 2px solid #ffffff;
+  margin-top: -5px;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.45);
+  transition: transform 0.12s ease;
+}
+
+input[type='range'].listen-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* Waveform pulse animation */
+@keyframes waveBar {
+  0%, 100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.animate-wave-1 {
+  animation: waveBar 0.9s ease-in-out infinite;
+}
+.animate-wave-2 {
+  animation: waveBar 0.9s ease-in-out 0.18s infinite;
+}
+.animate-wave-3 {
+  animation: waveBar 0.9s ease-in-out 0.36s infinite;
+}
+.animate-wave-4 {
+  animation: waveBar 0.9s ease-in-out 0.54s infinite;
+}
