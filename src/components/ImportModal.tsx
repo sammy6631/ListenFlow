@@ -51,6 +51,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
   const [ocrProgress, setOcrProgress] = useState<number>(0);
   const [ocrStatus, setOcrStatus] = useState<string>('');
   const [copiedBookmarklet, setCopiedBookmarklet] = useState(false);
+  const bookmarkletRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -60,7 +61,14 @@ export const ImportModal: React.FC<ImportModalProps> = ({
   }, [isOpen, initialTab]);
 
   const appOrigin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001';
-  const bookmarkletHref = `javascript:(()=>{const sel=window.getSelection().toString().trim();const txt=sel||(document.querySelector('article,main')?.innerText||document.body.innerText||'').trim();const title=document.title||'Web Page';const url=location.href;if(!txt){alert('No readable text found on this page.');return;}fetch('${appOrigin}/api/share',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,text:txt.slice(0,120000),sourceUrl:url,sourceType:'web'})}).then(r=>r.json()).then(d=>{if(d.id){window.open('${appOrigin}/?share='+d.id,'_blank');}else{throw new Error();}}).catch(()=>{const q=sel&&sel.length<3500?'?title='+encodeURIComponent(title)+'&text='+encodeURIComponent(sel):'?url='+encodeURIComponent(url);window.open('${appOrigin}/'+q,'_blank');});})();`;
+  const bookmarkletHref = `javascript:(()=>{try{const s=window.getSelection().toString().trim();const t=s||(document.querySelector('article,main')?.innerText||document.body.innerText||'').trim();if(!t){alert('No readable text found on this page.');return;}const f=document.createElement('form');f.method='POST';f.action='${appOrigin}/api/share-open';f.target='_blank';f.style.display='none';const add=(k,v)=>{const i=document.createElement('input');i.type='hidden';i.name=k;i.value=v;f.appendChild(i);};add('title',document.title||'Web Page');add('sourceUrl',location.href);add('text',t.slice(0,120000));document.body.appendChild(f);f.submit();f.remove();}catch(e){window.open('${appOrigin}/?url='+encodeURIComponent(location.href),'_blank');}})();`;
+
+  // Set javascript: href directly on the DOM node so React 19 does not strip it
+  useEffect(() => {
+    if (isOpen && tab === 'screen' && bookmarkletRef.current) {
+      bookmarkletRef.current.setAttribute('href', bookmarkletHref);
+    }
+  }, [isOpen, tab, bookmarkletHref]);
 
   const handleImageOcr = useCallback(
     async (file: File | Blob, label = 'Screenshot OCR') => {
@@ -435,7 +443,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                 </div>
                 <div className="flex flex-wrap items-center gap-2.5">
                   <a
-                    href={bookmarkletHref}
+                    ref={bookmarkletRef}
                     onClick={(e) => {
                       e.preventDefault();
                       copyBookmarklet();
@@ -456,6 +464,9 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                     {copiedBookmarklet ? 'Copied Bookmarklet Code!' : 'Copy Code'}
                   </button>
                 </div>
+                <p className="text-[11px] text-slate-400">
+                  Tip: If dragging is tricky, click <strong className="text-slate-300">Copy Code</strong>, right-click your Chrome bookmarks bar → <strong className="text-slate-300">Add page…</strong>, name it <strong className="text-slate-300">ListenFlow</strong>, and paste into the <strong className="text-slate-300">URL</strong> box.
+                </p>
               </div>
 
               {/* Tool 2: Screenshot / Image OCR */}

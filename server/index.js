@@ -23,6 +23,7 @@ app.use(
   })
 );
 app.use(express.json({ limit: '15mb' }));
+app.use(express.urlencoded({ extended: false, limit: '15mb' }));
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -173,6 +174,31 @@ app.post('/api/share', (req, res) => {
     res.json({ id });
   } catch (err) {
     res.status(400).json({ error: err.message || 'Failed to store shared text.' });
+  }
+});
+
+// Bookmarklet form POST endpoint: opens directly in a new tab (avoids popup blockers & CORS)
+app.post('/api/share-open', (req, res) => {
+  try {
+    const { title, text, sourceUrl = '' } = req.body || {};
+    if (!text || typeof text !== 'string' || !text.trim()) {
+      return res.redirect(303, '/');
+    }
+    const paragraphs = textToParagraphs(text);
+    if (!paragraphs.length) {
+      return res.redirect(303, '/');
+    }
+    const doc = buildDocumentPayload({
+      title: title || 'Web Page',
+      sourceType: 'web',
+      sourceUrl,
+      paragraphs,
+    });
+    const id = crypto.randomBytes(6).toString('hex');
+    shareStore.set(id, { doc, createdAt: Date.now() });
+    res.redirect(303, `/?share=${id}`);
+  } catch {
+    res.redirect(303, '/');
   }
 });
 
