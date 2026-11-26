@@ -356,6 +356,10 @@ export function useAudioPlayer(
       utterance.onerror = (ev) => {
         if (playSessionRef.current !== sessionId) return;
         if (ev.error === 'interrupted' || ev.error === 'canceled') return;
+        if (ev.error === 'not-allowed') {
+          stopAllPlayback();
+          return;
+        }
         setError(`Browser speech error: ${ev.error}`);
         stopAllPlayback();
       };
@@ -440,7 +444,17 @@ export function useAudioPlayer(
           playWithBrowserSpeech(targetDoc, index, sessionId);
         };
 
-        await audio.play();
+        try {
+          await audio.play();
+        } catch (playErr) {
+          if (playSessionRef.current !== sessionId) return;
+          if (playErr instanceof DOMException && playErr.name === 'NotAllowedError') {
+            // Browser blocked autoplay on a newly opened tab — keep chunk cached and let user tap Play
+            stopAllPlayback();
+            return;
+          }
+          throw playErr;
+        }
         if (playSessionRef.current !== sessionId) return;
         setIsLoading(false);
         startWordSyncLoop(targetDoc.paragraphs[index]);

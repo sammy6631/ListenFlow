@@ -213,12 +213,18 @@ export default function App() {
     if (shareId) {
       showToast('Loading text from webpage...');
       fetchSharedDocument(shareId)
-        .then((doc) => addImportedDocument(doc, true))
+        .then((doc) => {
+          addImportedDocument(doc, false);
+          showToast(`Loaded "${doc.title}" — click Play (or Space) to listen!`);
+        })
         .catch((err) => showToast(err.message || 'Could not load shared page.'));
     } else if (urlParam) {
       showToast('Extracting article from URL...');
       parseWebUrl(urlParam)
-        .then((doc) => addImportedDocument(doc, true))
+        .then((doc) => {
+          addImportedDocument(doc, false);
+          showToast(`Loaded "${doc.title}" — click Play (or Space) to listen!`);
+        })
         .catch((err) => showToast(err.message || 'Could not extract URL.'));
     } else if (textParam) {
       // Sometimes Android Share sends a URL inside the text param
@@ -226,13 +232,19 @@ export default function App() {
       if (/^https?:\/\/\S+$/i.test(trimmed)) {
         showToast('Extracting article from shared link...');
         parseWebUrl(trimmed)
-          .then((doc) => addImportedDocument(doc, true))
+          .then((doc) => {
+            addImportedDocument(doc, false);
+            showToast(`Loaded "${doc.title}" — click Play (or Space) to listen!`);
+          })
           .catch(() => {
-            parseRawText(trimmed, titleParam, 'text').then((doc) => addImportedDocument(doc, true));
+            parseRawText(trimmed, titleParam, 'text').then((doc) => addImportedDocument(doc, false));
           });
       } else {
         parseRawText(trimmed, titleParam, 'text')
-          .then((doc) => addImportedDocument(doc, true))
+          .then((doc) => {
+            addImportedDocument(doc, false);
+            showToast(`Loaded "${doc.title}" — click Play (or Space) to listen!`);
+          })
           .catch((err) => showToast(err.message || 'Could not import shared text.'));
       }
     }
